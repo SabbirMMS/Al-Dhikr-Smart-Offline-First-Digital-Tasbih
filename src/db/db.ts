@@ -91,6 +91,14 @@ export const PRELOADED_TEMPLATES = [
     isPreloaded: true,
   },
   {
+    name: 'La ilaha illallah',
+    arabicText: 'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ',
+    translation: 'There is no deity but Allah',
+    category: 'Tawheed',
+    defaultTarget: 100,
+    isPreloaded: true,
+  },
+  {
     name: 'Allahu Akbar',
     arabicText: 'ٱللَّٰهُ أَكْبَرُ',
     translation: 'Allah is the Greatest',
@@ -111,14 +119,6 @@ export const PRELOADED_TEMPLATES = [
     arabicText: 'أَسْتَغْفِرُ ٱللَّٰهَ',
     translation: 'I seek forgiveness from Allah',
     category: 'Istighfar',
-    defaultTarget: 100,
-    isPreloaded: true,
-  },
-  {
-    name: 'La ilaha illallah',
-    arabicText: 'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ',
-    translation: 'There is no deity but Allah',
-    category: 'Tawheed',
     defaultTarget: 100,
     isPreloaded: true,
   }
