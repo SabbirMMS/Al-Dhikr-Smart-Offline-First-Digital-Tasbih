@@ -122,6 +122,11 @@ npm run dev
 npm run build
 ```
 
+### Build for Chrome Extension:
+```bash
+npm run build:extension
+``` 
+
 ---
 
 ## 📝 Guide for Future Agent Extensions (Sync / API Integrations)

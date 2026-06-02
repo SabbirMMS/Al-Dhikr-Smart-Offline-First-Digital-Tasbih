@@ -81,3 +81,24 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(16, 185, 129, 0.5);
 }
+
+/* Chrome Extension specific layout fixes */
+html.is-extension, body.is-extension {
+  width: 420px;
+  height: 600px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+html.is-extension #root, body.is-extension #root {
+  width: 420px;
+  height: 600px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+html.is-extension main, body.is-extension main {
+  overflow-y: auto;
+}

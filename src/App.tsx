@@ -26,6 +26,18 @@ const MainAppContent: React.FC = () => {
   const { activeProfile, isAuthenticated } = useAppSelector((state) => state.profiles);
   const { theme } = useAppSelector((state) => state.settings);
 
+  // Extension check and style injection
+  useEffect(() => {
+    const isExtension = typeof window !== 'undefined' && 
+      (window as any).chrome && 
+      (window as any).chrome.runtime && 
+      (window as any).chrome.runtime.id;
+    if (isExtension) {
+      document.documentElement.classList.add('is-extension');
+      document.body.classList.add('is-extension');
+    }
+  }, []);
+
   // 1. Initial Load of profiles
   useEffect(() => {
     dispatch(fetchProfiles());
