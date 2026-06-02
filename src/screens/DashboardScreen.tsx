@@ -273,8 +273,13 @@ export const DashboardScreen: React.FC = () => {
           )}
 
           {activeTasbih.translation && (
-            <p className="text-xs italic text-slate-400 dark:text-slate-300 mt-2.5 leading-relaxed line-clamp-2">
+            <p className="text-xs italic text-slate-400 dark:text-slate-300 mt-1 select-text">
               "{activeTasbih.translation}"
+            </p>
+          )}
+          {activeTasbih.pronunciation && (
+            <p className="text-xs italic text-slate-400 dark:text-slate-300 mt-1 select-text">
+              Pronunciation: {activeTasbih.pronunciation}
             </p>
           )}
         </div>

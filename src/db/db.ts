@@ -13,6 +13,7 @@ export interface Tasbih {
   name: string;
   arabicText?: string;
   translation?: string;
+  pronunciation?: string;
   category?: string;
   defaultTarget: number;
   isPreloaded: boolean;

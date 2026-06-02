@@ -28,6 +28,7 @@ export const addTasbihThunk = createAsyncThunk(
     profileId,
     name,
     arabicText,
+    pronunciation,
     translation,
     category,
     defaultTarget,
@@ -35,11 +36,12 @@ export const addTasbihThunk = createAsyncThunk(
     profileId: number;
     name: string;
     arabicText?: string;
+    pronunciation?: string;
     translation?: string;
     category?: string;
     defaultTarget: number;
   }) => {
-    return await addCustomTasbih(profileId, name, arabicText, translation, category, defaultTarget);
+    return await addCustomTasbih(profileId, name, arabicText, pronunciation, translation, category, defaultTarget);
   }
 );
 

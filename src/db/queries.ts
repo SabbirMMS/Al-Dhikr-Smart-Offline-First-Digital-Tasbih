@@ -51,6 +51,7 @@ export async function addCustomTasbih(
   profileId: number,
   name: string,
   arabicText?: string,
+  pronunciation?: string,
   translation?: string,
   category?: string,
   defaultTarget = 100
@@ -59,6 +60,7 @@ export async function addCustomTasbih(
     profileId,
     name,
     arabicText,
+    pronunciation,
     translation,
     category: category || 'General',
     defaultTarget,

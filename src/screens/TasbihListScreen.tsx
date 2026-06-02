@@ -18,6 +18,7 @@ export const TasbihListScreen: React.FC = () => {
   // Fields state
   const [name, setName] = useState('');
   const [arabicText, setArabicText] = useState('');
+  const [pronunciation, setPronunciation] = useState('');
   const [translation, setTranslation] = useState('');
   const [category, setCategory] = useState('General');
   const [isNewCategory, setIsNewCategory] = useState(false);
@@ -33,6 +34,7 @@ export const TasbihListScreen: React.FC = () => {
     setEditingId(null);
     setName('');
     setArabicText('');
+    setPronunciation('');
     setTranslation('');
     setCategory('General');
     setIsNewCategory(false);
@@ -46,6 +48,7 @@ export const TasbihListScreen: React.FC = () => {
     setEditingId(t.id);
     setName(t.name);
     setArabicText(t.arabicText || '');
+    setPronunciation(t.pronunciation || '');
     setTranslation(t.translation || '');
     const cat = t.category || 'General';
     setCategory(cat);
@@ -79,6 +82,7 @@ export const TasbihListScreen: React.FC = () => {
             updates: {
               name: name.trim(),
               arabicText: arabicText.trim() || undefined,
+              pronunciation: pronunciation.trim() || undefined,
               translation: translation.trim() || undefined,
               category: category.trim() || 'General',
               defaultTarget,
@@ -92,6 +96,7 @@ export const TasbihListScreen: React.FC = () => {
             profileId: activeProfile?.id!,
             name: name.trim(),
             arabicText: arabicText.trim() || undefined,
+            pronunciation: pronunciation.trim() || undefined,
             translation: translation.trim() || undefined,
             category: category.trim() || 'General',
             defaultTarget,
@@ -195,6 +200,11 @@ export const TasbihListScreen: React.FC = () => {
                       {t.arabicText}
                     </p>
                   )}
+                  {t.pronunciation && (
+                    <p className="text-xs text-slate-400 dark:text-slate-300 italic leading-relaxed mt-1 select-text">
+                      Pronunciation: {t.pronunciation}
+                    </p>
+                  )}
                   {t.translation && (
                     <p className="text-xs text-slate-400 dark:text-slate-300 italic leading-relaxed mt-1 select-text">
                       "{t.translation}"
@@ -275,6 +285,16 @@ export const TasbihListScreen: React.FC = () => {
                   placeholder="e.g. سُبْحَانَ ٱللَّٰهِ"
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-amber-500 text-sm arabic-text text-right font-arabic"
                   dir="rtl"
+                />
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 mt-2">
+                  Pronunciation (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={pronunciation}
+                  onChange={(e) => setPronunciation(e.target.value)}
+                  placeholder="e.g. SubhanAllah"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-amber-500 text-sm"
                 />
               </div>
 
