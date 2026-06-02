@@ -20,11 +20,14 @@ export const TasbihListScreen: React.FC = () => {
   const [arabicText, setArabicText] = useState('');
   const [translation, setTranslation] = useState('');
   const [category, setCategory] = useState('General');
+  const [isNewCategory, setIsNewCategory] = useState(false);
+  const [newCategoryText, setNewCategoryText] = useState('');
   const [defaultTarget, setDefaultTarget] = useState(100);
   const [formError, setFormError] = useState('');
 
   // Extract unique categories
   const categories = ['All', ...Array.from(new Set(tasbihs.map((t) => t.category || 'General')))];
+  const existingCategories = Array.from(new Set(['General', ...tasbihs.map((t) => t.category || 'General')]));
 
   const handleOpenCreate = () => {
     setEditingId(null);
@@ -32,6 +35,8 @@ export const TasbihListScreen: React.FC = () => {
     setArabicText('');
     setTranslation('');
     setCategory('General');
+    setIsNewCategory(false);
+    setNewCategoryText('');
     setDefaultTarget(100);
     setFormError('');
     setShowForm(true);
@@ -42,7 +47,10 @@ export const TasbihListScreen: React.FC = () => {
     setName(t.name);
     setArabicText(t.arabicText || '');
     setTranslation(t.translation || '');
-    setCategory(t.category || 'General');
+    const cat = t.category || 'General';
+    setCategory(cat);
+    setIsNewCategory(false);
+    setNewCategoryText('');
     setDefaultTarget(t.defaultTarget);
     setFormError('');
     setShowForm(true);
@@ -288,14 +296,52 @@ export const TasbihListScreen: React.FC = () => {
                   <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                     Category
                   </label>
-                  <input
-                    type="text"
-                    maxLength={15}
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder="e.g. Adhkar, Morning"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-amber-500 text-sm font-semibold"
-                  />
+                  {!isNewCategory ? (
+                    <select
+                      value={category}
+                      onChange={(e) => {
+                        if (e.target.value === '__new__') {
+                          setIsNewCategory(true);
+                          setCategory('');
+                          setNewCategoryText('');
+                        } else {
+                          setCategory(e.target.value);
+                        }
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-amber-500 text-sm font-semibold cursor-pointer"
+                    >
+                      {existingCategories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                      <option value="__new__">+ Create New...</option>
+                    </select>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        maxLength={15}
+                        value={newCategoryText}
+                        onChange={(e) => {
+                          setNewCategoryText(e.target.value);
+                          setCategory(e.target.value);
+                        }}
+                        placeholder="e.g. Adhkar"
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-amber-500 text-sm font-semibold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsNewCategory(false);
+                          setCategory(existingCategories[0] || 'General');
+                        }}
+                        className="px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-350 dark:border-slate-750 transition cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">

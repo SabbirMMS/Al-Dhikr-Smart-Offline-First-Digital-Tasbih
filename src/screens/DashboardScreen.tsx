@@ -4,7 +4,7 @@ import { incrementCounterThunk, resetCounterThunk, setActiveTasbihId } from '../
 import { logoutProfile } from '../store/profileSlice';
 import { TargetProgress } from '../components/TargetProgress';
 import { Confetti } from '../components/Confetti';
-import { RotateCcw, ChevronRight, LogOut, Keyboard, Sparkles, Check } from 'lucide-react';
+import { RotateCcw, ChevronRight, ChevronDown, LogOut, Keyboard, Sparkles, Check, Search, X } from 'lucide-react';
 
 export const DashboardScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -22,9 +22,33 @@ export const DashboardScreen: React.FC = () => {
   // Recommendations state
   const [recommendations, setRecommendations] = useState<any[]>([]);
 
+  // Active Selector Modal state
+  const [showSelectorModal, setShowSelectorModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Find active tasbih and active counter
   const activeTasbih = tasbihs.find((t) => t.id === activeTasbihId) || tasbihs[0];
   const activeCounter = counterStates.find((c) => c.tasbihId === activeTasbih?.id);
+
+  // Load persisted active tasbih ID on mount/profile switch
+  useEffect(() => {
+    if (!activeProfile?.id) return;
+    const savedIdStr = localStorage.getItem(`tasbih_active_tasbih_id_${activeProfile.id}`);
+    if (savedIdStr) {
+      const savedId = Number(savedIdStr);
+      // Verify the saved tasbih still exists in active list
+      if (tasbihs.some(t => t.id === savedId) && activeTasbihId !== savedId) {
+        dispatch(setActiveTasbihId(savedId));
+      }
+    }
+  }, [activeProfile?.id, tasbihs, activeTasbihId, dispatch]);
+
+  // Save selected active tasbih to localStorage whenever it changes
+  const handleSelectActiveTasbih = (id: number) => {
+    if (!activeProfile?.id) return;
+    localStorage.setItem(`tasbih_active_tasbih_id_${activeProfile.id}`, String(id));
+    dispatch(setActiveTasbihId(id));
+  };
 
   const count = activeCounter ? activeCounter.currentCount : 0;
   const target = activeCounter ? activeCounter.targetCount : (activeTasbih ? activeTasbih.defaultTarget : 100);
@@ -225,11 +249,21 @@ export const DashboardScreen: React.FC = () => {
         <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
 
         {/* Dhikr Script Labels */}
-        <div className="text-center mb-6 max-w-xs px-2">
+        <div className="text-center mb-6 max-w-xs px-2 flex flex-col items-center">
           <span className="inline-block px-2.5 py-0.5 bg-emerald-100/60 dark:bg-emerald-950/60 text-emerald-800 dark:text-amber-400 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
             {activeTasbih.category || 'General'}
           </span>
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 line-clamp-1">{activeTasbih.name}</h2>
+          
+          <button
+            onClick={() => setShowSelectorModal(true)}
+            className="group flex items-center justify-center gap-1.5 px-3 py-1 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-250/20 dark:hover:border-slate-800/20 transition-all active:scale-97 cursor-pointer"
+            title="Change active Dhikr"
+          >
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-amber-500 transition-colors line-clamp-1">
+              {activeTasbih.name}
+            </h2>
+            <ChevronDown size={18} className="text-slate-400 dark:text-slate-500 group-hover:text-emerald-700 dark:group-hover:text-amber-500 transition-colors" />
+          </button>
           
           {/* Elegant Arabic calligraphic text */}
           {activeTasbih.arabicText && (
@@ -343,6 +377,94 @@ export const DashboardScreen: React.FC = () => {
       <div className="w-full max-w-md mx-auto text-center mt-3 text-[10px] text-slate-400 flex items-center justify-center gap-1 select-none">
         <Keyboard size={11} /> Shortcuts: <span className="font-semibold bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[9px]">Space</span> / <span className="font-semibold bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[9px]">Enter</span> to count.
       </div>
+
+      {/* Search & Select Dhikr Modal */}
+      {showSelectorModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-md w-full rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col max-h-[80vh]">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-slate-800 dark:text-amber-500 flex items-center gap-1.5">
+                <Sparkles size={16} className="text-amber-500" /> Select Dhikr Counter
+              </h3>
+              <button
+                onClick={() => {
+                  setShowSelectorModal(false);
+                  setSearchQuery('');
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-650 dark:hover:text-slate-200 hover:bg-slate-105 dark:hover:bg-slate-800 transition"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
+              <input
+                type="text"
+                placeholder="Search name or category..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-semibold"
+              />
+            </div>
+
+            {/* Scrollable list of Tasbihs */}
+            <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
+              {tasbihs.filter(t => 
+                t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                (t.category || 'General').toLowerCase().includes(searchQuery.toLowerCase())
+              ).length === 0 ? (
+                <div className="text-center py-8 text-slate-400 text-xs">
+                  No matching dhikr found.
+                </div>
+              ) : (
+                tasbihs.filter(t => 
+                  t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                  (t.category || 'General').toLowerCase().includes(searchQuery.toLowerCase())
+                ).map(t => {
+                  const isSelected = activeTasbih.id === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        handleSelectActiveTasbih(t.id!);
+                        setShowSelectorModal(false);
+                        setSearchQuery('');
+                      }}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition active:scale-99 ${
+                        isSelected
+                          ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500 dark:border-amber-500'
+                          : 'bg-slate-50 border-slate-200/50 dark:bg-slate-800/40 dark:border-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                      }`}
+                    >
+                      <div className="flex-1 pr-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-[8px] font-bold text-slate-400 dark:text-slate-500 rounded">
+                            {t.category || 'General'}
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1 line-clamp-1">
+                          {t.name}
+                        </h4>
+                        {t.arabicText && (
+                          <p className="arabic-text text-sm font-arabic font-semibold text-emerald-800 dark:text-amber-500 leading-none mt-0.5" dir="rtl">
+                            {t.arabicText}
+                          </p>
+                        )}
+                      </div>
+                      {isSelected && (
+                        <Check size={14} className="text-emerald-600 dark:text-amber-500 shrink-0" />
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

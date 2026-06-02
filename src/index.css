@@ -2,6 +2,8 @@
 
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-arabic: 'Noto Naskh Arabic', 'Amiri', serif;
   --font-sans: 'Outfit', 'Inter', sans-serif;
