@@ -123,6 +123,8 @@ npm run build
 ```
 
 ### Build for Chrome Extension:
+> You can load this extension directly into Chrome by going to `chrome://extensions/`, enabling Developer Mode, and clicking "Load unpacked" to select the output `extension` folder.
+
 ```bash
 npm run build:extension
 ``` 
