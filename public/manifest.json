@@ -1,0 +1,30 @@
+{
+  "name": "Al-Dhikr Smart Digital Tasbih",
+  "short_name": "Al-Dhikr",
+  "description": "Offline-first smart digital Tasbih counter with multi-profile locking, automated streaks, and local backups.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#022c22",
+  "theme_color": "#022c22",
+  "orientation": "portrait",
+  "categories": ["utilities", "lifestyle"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

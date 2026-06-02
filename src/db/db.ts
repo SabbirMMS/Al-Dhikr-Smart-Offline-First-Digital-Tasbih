@@ -1,0 +1,159 @@
+import Dexie, { type Table } from 'dexie';
+
+export interface Profile {
+  id?: number;
+  name: string;
+  pinLock: string | null; // Stored as plain string or hashed PIN for simple lock screen
+  createdAt: Date;
+}
+
+export interface Tasbih {
+  id?: number;
+  profileId: number;       // Links to a Profile.id
+  name: string;
+  arabicText?: string;
+  translation?: string;
+  category?: string;
+  defaultTarget: number;
+  isPreloaded: boolean;
+  createdAt: Date;
+}
+
+export interface CounterState {
+  id?: number;
+  profileId: number;
+  tasbihId: number;
+  currentCount: number;
+  sessionCount: number;
+  targetCount: number;
+  lastUpdated: Date;
+}
+
+export interface HistoryRecord {
+  id?: number;
+  profileId: number;
+  tasbihId: number;
+  count: number;
+  dateStr: string;        // 'YYYY-MM-DD'
+  targetCompleted: boolean;
+  timestamp: Date;
+}
+
+export interface DailySummary {
+  id?: number;
+  profileId: number;
+  dateStr: string;        // 'YYYY-MM-DD'
+  totalCount: number;
+  completedGoalsCount: number;
+  totalGoalsCount: number;
+  streak: number;
+}
+
+class TasbihDatabase extends Dexie {
+  profiles!: Table<Profile>;
+  tasbihs!: Table<Tasbih>;
+  counterStates!: Table<CounterState>;
+  historyRecords!: Table<HistoryRecord>;
+  dailySummaries!: Table<DailySummary>;
+
+  constructor() {
+    super('TasbihDatabase');
+    
+    // Define tables and indexes
+    this.version(1).stores({
+      profiles: '++id, name, createdAt',
+      tasbihs: '++id, profileId, name, category, isPreloaded',
+      counterStates: '++id, profileId, tasbihId, lastUpdated',
+      historyRecords: '++id, profileId, tasbihId, dateStr, timestamp',
+      dailySummaries: '++id, profileId, dateStr',
+    });
+  }
+}
+
+export const db = new TasbihDatabase();
+
+// Preloaded templates definitions
+export const PRELOADED_TEMPLATES = [
+  {
+    name: 'SubhanAllah',
+    arabicText: 'سُبْحَانَ ٱللَّٰهِ',
+    translation: 'Glory be to Allah',
+    category: 'Adhkar',
+    defaultTarget: 33,
+    isPreloaded: true,
+  },
+  {
+    name: 'Alhamdulillah',
+    arabicText: 'ٱلْحَمْدُ لِلَّٰهِ',
+    translation: 'Praise be to Allah',
+    category: 'Adhkar',
+    defaultTarget: 33,
+    isPreloaded: true,
+  },
+  {
+    name: 'Allahu Akbar',
+    arabicText: 'ٱللَّٰهُ أَكْبَرُ',
+    translation: 'Allah is the Greatest',
+    category: 'Adhkar',
+    defaultTarget: 34,
+    isPreloaded: true,
+  },
+  {
+    name: 'Durood (Salawat)',
+    arabicText: 'ٱللَّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ',
+    translation: 'O Allah, send blessings upon Muhammad and his family',
+    category: 'Salawat',
+    defaultTarget: 100,
+    isPreloaded: true,
+  },
+  {
+    name: 'Istighfar',
+    arabicText: 'أَسْتَغْفِرُ ٱللَّٰهَ',
+    translation: 'I seek forgiveness from Allah',
+    category: 'Istighfar',
+    defaultTarget: 100,
+    isPreloaded: true,
+  },
+  {
+    name: 'La ilaha illallah',
+    arabicText: 'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ',
+    translation: 'There is no deity but Allah',
+    category: 'Tawheed',
+    defaultTarget: 100,
+    isPreloaded: true,
+  }
+];
+
+/**
+ * Initialize default preloaded tasbihs for a new profile
+ */
+export async function initializePreloadedTasbihs(profileId: number) {
+  const existingPreloaded = await db.tasbihs
+    .where({ profileId, isPreloaded: 1 })
+    .count();
+
+  if (existingPreloaded === 0) {
+    const tasbihsToInsert = PRELOADED_TEMPLATES.map((tpl) => ({
+      ...tpl,
+      profileId,
+      createdAt: new Date(),
+    }));
+    
+    // We add them in bulk
+    const insertedIds = [];
+    for (const t in tasbihsToInsert) {
+      const id = await db.tasbihs.add(tasbihsToInsert[t] as Tasbih);
+      insertedIds.push(id);
+      
+      // Also initialize their counterStates
+      await db.counterStates.add({
+        profileId,
+        tasbihId: id,
+        currentCount: 0,
+        sessionCount: 0,
+        targetCount: tasbihsToInsert[t].defaultTarget,
+        lastUpdated: new Date(),
+      });
+    }
+  }
+}
